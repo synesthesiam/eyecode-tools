@@ -50,13 +50,16 @@ def make_dataframe(experiments):
             ended = datetime.strptime(t.attrib["ended"], TIME_FORMAT)
             response_duration = float(t.attrib["response-duration"])
 
+            code_lines = int(t.xpath(".//metric[@name='code lines']/@value")[0])
+
             rows.append([id, exp_id, base, version, grade_value, grade_category,
                 started, ended, response_duration, py_years, prog_years, age,
-                degree, gender, location])
+                degree, gender, location, code_lines])
 
     cols = ("id", "exp_id", "base", "version", "grade_value",
             "grade_category", "started", "ended", "response_duration",
-            "py_years", "prog_years", "age", "degree", "gender", "location")
+            "py_years", "prog_years", "age", "degree", "gender", "location",
+            "code_lines")
 
     df = pandas.DataFrame(rows, columns=cols)
 
@@ -80,7 +83,7 @@ def response_times(df, base, versions, threshold=300):
         v_rows = df[(df["base"] == base) & (df["version"] == v)]
         for _, row in v_rows.iterrows():
             duration = row["duration"]
-            if duration <= threshold and "correct" in row["grade_category"]:
+            if duration <= threshold:
                 rows.append([v, duration])
 
     resp_df = pandas.DataFrame(rows, columns=("version", "response_time"))
